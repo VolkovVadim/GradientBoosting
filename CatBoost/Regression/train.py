@@ -7,7 +7,7 @@ import numpy as np
 
 from catboost import CatBoostRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+from sklearn.metrics import root_mean_squared_error, mean_absolute_error
 
 
 DATASET_FILENAME="regression_v3_10000.csv"
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
 
     # Calculate metrics
-    rmse_score = np.sqrt(mean_squared_error(test_Y, pred_Y))
+    rmse_score = root_mean_squared_error(test_Y, pred_Y)
     mae_score = mean_absolute_error(test_Y, pred_Y)
 
     print(f"RMSE : {rmse_score:.2f}")
