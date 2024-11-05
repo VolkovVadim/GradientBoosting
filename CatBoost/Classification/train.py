@@ -2,16 +2,17 @@ import catboost
 import time
 import os
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-
 
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error
+from matplotlib.pyplot import figure
 
 
-DATASET_FILENAME="binary_classification_v3_10000.csv"
+DATASET_FILENAME="binary_classification_v3_500000.csv"
 
 
 def show_info(dataframe: pd.DataFrame) -> None:
@@ -29,6 +30,39 @@ def show_info(dataframe: pd.DataFrame) -> None:
         print(f"  {column_name}{' ' * (max_len - len(column_name))} : <{data_type}>")
 
     print("\n")
+
+
+def visualize(data: pd.DataFrame) -> None:
+    plt.style.use('ggplot')
+    figure(figsize=(12, 10), dpi=80)
+
+    label_font = {
+        'family': 'serif',
+        'color': 'darkblue',
+        'size': 10
+    }
+
+    plt.xlabel('Feature 1', fontdict=label_font)
+    plt.ylabel('Feature 2', fontdict=label_font)
+    plt.title('Multilabel classification')
+
+    color_map = {
+        0: 'red',
+        1: 'blue',
+        2: 'green'
+    }
+
+    color = [color_map[label] for label in data.class_label]
+    point_size = 5 if data.shape[0] < 50000 else 1
+
+    plt.scatter(
+        data.feature_1,
+        data.feature_2,
+        s=point_size,
+        c=color
+    )
+
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -61,7 +95,7 @@ if __name__ == "__main__":
 
     # Create and fit model
     model = CatBoostClassifier(
-        iterations=100,
+        iterations=2000,
         depth=5,
         learning_rate=0.05,
         random_seed=789
@@ -90,6 +124,11 @@ if __name__ == "__main__":
 
     print(f"RMSE : {rmse_score:.2f}")
     print(f"MAE  : {mae_score:.2f}")
+
+
+    # Visualize
+    results = test_X.assign(class_label=pred_Y)
+    visualize(results)
 
 
     print("Success")
