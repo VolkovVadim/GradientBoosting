@@ -4,6 +4,7 @@ import os
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from catboost import CatBoostRegressor
 from sklearn.model_selection import train_test_split
@@ -28,6 +29,36 @@ def show_info(dataframe: pd.DataFrame) -> None:
         print(f"  {column_name}{' ' * (max_len - len(column_name))} : <{data_type}>")
 
     print("\n")
+
+
+def visualize(data: pd.DataFrame) -> None:
+    plt.style.use('fivethirtyeight')
+    fig = plt.figure(figsize=(12, 10), dpi=80)
+    ax = fig.add_subplot(projection='3d')
+    ax.set_xlabel("feature_1")
+    ax.set_ylabel("feature_2")
+    ax.set_zlabel("value")
+
+    ax.xaxis.label.set_color("blue")
+    ax.yaxis.label.set_color("blue")
+    ax.zaxis.label.set_color("red")
+
+    color = data.value
+    points_count = data.shape[0]
+    point_size = 5 if points_count < 50000 else 1
+
+    ax.text2D(0.05, 0.95, f"Model predictions ({points_count} examples)", transform=ax.transAxes)
+
+    ax.scatter(
+        data['feature_1'],
+        data['feature_2'],
+        data['value'],
+        c = color,           # values for cmap
+        s = point_size,      # marker size
+        cmap='viridis'
+    )
+
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -58,7 +89,7 @@ if __name__ == "__main__":
     model = CatBoostRegressor(
         objective='RMSE',
         depth=5,
-        iterations=20000,
+        iterations=10000,
         learning_rate=0.025
     )
 
@@ -85,6 +116,13 @@ if __name__ == "__main__":
 
     print(f"RMSE : {rmse_score:.2f}")
     print(f"MAE  : {mae_score:.2f}")
+
+
+    # Visualize results
+    results = test_X.copy()
+    results.reset_index(drop=True, inplace=True)
+    results["value"] = pred_Y
+    visualize(results)
 
 
     print("Success")
