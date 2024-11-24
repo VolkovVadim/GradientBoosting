@@ -12,7 +12,8 @@ from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 from matplotlib.pyplot import figure
 
 
-DATASET_FILENAME="binary_classification_v3_500000.csv"
+DATASET_FILENAME="binary_classification_v3_100000_with_noise.csv"
+BORDERS_FILENAME="binary_classification_v3_border.csv"
 
 
 def show_info(dataframe: pd.DataFrame) -> None:
@@ -32,7 +33,7 @@ def show_info(dataframe: pd.DataFrame) -> None:
     print("\n")
 
 
-def visualize(data: pd.DataFrame) -> None:
+def visualize(data: pd.DataFrame, borders: pd.DataFrame = None) -> None:
     plt.style.use('ggplot')
     figure(figsize=(12, 10), dpi=80)
 
@@ -42,9 +43,22 @@ def visualize(data: pd.DataFrame) -> None:
         'size': 10
     }
 
+    points_count = data.shape[0]
+
     plt.xlabel('Feature 1', fontdict=label_font)
     plt.ylabel('Feature 2', fontdict=label_font)
-    plt.title('Multilabel classification')
+    plt.title(f'Multilabel classification ({points_count} predictions)')
+
+    if borders is not None:
+        plt.plot(
+            borders.x1,
+            borders.y1,
+            linestyle='--',
+            linewidth=2,
+            #c='midnightblue',
+            #c='indigo'
+            c='black'
+        )
 
     color_map = {
         0: 'red',
@@ -127,8 +141,12 @@ if __name__ == "__main__":
 
 
     # Visualize
+    df_borders = None
+    if os.path.exists(BORDERS_FILENAME):
+        df_borders = pd.read_csv(BORDERS_FILENAME)
+
     results = test_X.assign(class_label=pred_Y)
-    visualize(results)
+    visualize(data=results, borders=df_borders)
 
 
     print("Success")
