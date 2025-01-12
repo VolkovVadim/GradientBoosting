@@ -171,6 +171,7 @@ if __name__ == "__main__":
     accuracy_v2 = (TP + TN) / (TP + TN + FP + FN)
     precision   = TP / (TP + FP)
     recall      = TP / (TP + FN)
+    f1_measure  = TP / (TP + ((FP + FN) / 2))
 
     print(f"Results (correct : {correct}, incorrect : {incorrect}, accuracy : {correct / total})")
     print(f"  RMSE         : {rmse_score:.2f}")
@@ -179,6 +180,7 @@ if __name__ == "__main__":
     print(f"  Accuracy (2) : {accuracy_v2:.3f}")
     print(f"  Precision    : {precision:.2f}")
     print(f"  Recall       : {recall:.2f}")
+    print(f"  F1 measure   : {f1_measure:.2f}")
 
 
     # Visualize
