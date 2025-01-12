@@ -3,6 +3,7 @@ import time
 import os
 
 import matplotlib.pyplot as plt
+import seaborn as sns
 import pandas as pd
 import numpy as np
 
@@ -33,9 +34,8 @@ def show_info(dataframe: pd.DataFrame) -> None:
     print("\n")
 
 
-def visualize(data: pd.DataFrame, borders: pd.DataFrame = None) -> None:
+def visualize(predictions: pd.DataFrame, confusion: np.ndarray, borders: pd.DataFrame = None) -> None:
     plt.style.use('ggplot')
-    figure(figsize=(12, 10), dpi=80)
 
     label_font = {
         'family': 'serif',
@@ -43,14 +43,20 @@ def visualize(data: pd.DataFrame, borders: pd.DataFrame = None) -> None:
         'size': 10
     }
 
-    points_count = data.shape[0]
+    points_count = predictions.shape[0]
 
-    plt.xlabel('Feature 1', fontdict=label_font)
-    plt.ylabel('Feature 2', fontdict=label_font)
-    plt.title(f'Multilabel classification ({points_count} predictions)')
+    # Initialise the subplot function using number of rows and columns
+    _, axis = plt.subplots(ncols=2, figsize=(18, 8), dpi=80, num='Results')
+
+    predictions_axis, heatmap_axis = axis[0], axis[1]
+
+
+    predictions_axis.set_xlabel('Feature 1', fontdict=label_font, labelpad=5)
+    predictions_axis.set_ylabel('Feature 2', fontdict=label_font, labelpad=5)
+    predictions_axis.set_title(f'Binary classification ({points_count} predictions)')
 
     if borders is not None:
-        plt.plot(
+        predictions_axis.plot(
             borders.x1,
             borders.y1,
             linestyle='--',
@@ -66,15 +72,30 @@ def visualize(data: pd.DataFrame, borders: pd.DataFrame = None) -> None:
         2: 'green'
     }
 
-    color = [color_map[label] for label in data.class_label]
-    point_size = 5 if data.shape[0] < 50000 else 1
+    color = [color_map[label] for label in predictions.class_label]
+    point_size = 5 if predictions.shape[0] < 50000 else 1
 
-    plt.scatter(
-        data.feature_1,
-        data.feature_2,
+    predictions_axis.scatter(
+        predictions.feature_1,
+        predictions.feature_2,
         s=point_size,
         c=color
     )
+
+    heatmap_axis.set_title("Confusion matrix")
+
+    sns.heatmap(
+        confusion,
+        annot=True,
+        fmt='d',
+        cmap='plasma',
+        xticklabels=['Predicted False', 'Predicted True'],
+        yticklabels=['Actual False', 'Actual True'],
+        ax=heatmap_axis
+    )
+
+    heatmap_axis.set_xlabel('Predicted', fontdict=label_font, labelpad=5)
+    heatmap_axis.set_ylabel('Actual', fontdict=label_font, labelpad=5)
 
     plt.show()
 
@@ -152,14 +173,13 @@ if __name__ == "__main__":
     print(f"  Recall       : {recall:.2f}")
 
 
-
     # Visualize
     df_borders = None
     if os.path.exists(BORDERS_FILENAME):
         df_borders = pd.read_csv(BORDERS_FILENAME)
 
     results = test_X.assign(class_label=pred_Y)
-    visualize(data=results, borders=df_borders)
+    visualize(predictions=results, confusion=confusion, borders=df_borders)
 
 
     print("Success")
