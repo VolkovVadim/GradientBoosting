@@ -88,7 +88,7 @@ def visualize(predictions: pd.DataFrame, confusion: np.ndarray, borders: pd.Data
         confusion,
         annot=True,
         fmt='d',
-        cmap='plasma',
+        cmap='summer',
         xticklabels=['Predicted False', 'Predicted True'],
         yticklabels=['Actual False', 'Actual True'],
         ax=heatmap_axis
