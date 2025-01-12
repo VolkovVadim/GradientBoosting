@@ -8,8 +8,9 @@ import pandas as pd
 import numpy as np
 
 from catboost import CatBoostClassifier
+from sklearn import metrics
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, root_mean_squared_error, confusion_matrix, accuracy_score
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error, confusion_matrix, accuracy_score, roc_auc_score
 from matplotlib.pyplot import figure
 
 
@@ -100,6 +101,21 @@ def visualize(predictions: pd.DataFrame, confusion: np.ndarray, borders: pd.Data
     plt.show()
 
 
+def visualize_roc(predictions_proba, actual_labels):
+    plt.style.use('ggplot')
+    plt.figure(figsize=(12, 10), dpi=80)
+
+    FPR, TPR, _ = metrics.roc_curve(actual_labels, predictions_proba)
+    AUC = metrics.roc_auc_score(actual_labels, predictions_proba)
+
+    plt.title(f"AUC ROC : {AUC:.3f}")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.plot(FPR, TPR)
+
+    plt.show()
+
+
 if __name__ == "__main__":
     print("Versions")
     print(f"\tCatBoost : {catboost.__version__}")
@@ -151,6 +167,7 @@ if __name__ == "__main__":
 
     # Get predictions
     pred_Y = model.predict(test_X)
+    pred_Y_proba = model.predict_proba(test_X)[::,1]
 
 
     # Calculate metrics
@@ -166,6 +183,7 @@ if __name__ == "__main__":
     mae_score = mean_absolute_error(test_Y, pred_Y)
     accuracy_v1 = accuracy_score(test_Y, pred_Y)
     confusion = confusion_matrix(test_Y, pred_Y)
+    auc_roc = roc_auc_score(test_Y, pred_Y)
 
     TN, FP, FN, TP = confusion.ravel()
     accuracy_v2 = (TP + TN) / (TP + TN + FP + FN)
@@ -181,6 +199,7 @@ if __name__ == "__main__":
     print(f"  Precision    : {precision:.2f}")
     print(f"  Recall       : {recall:.2f}")
     print(f"  F1 measure   : {f1_measure:.2f}")
+    print(f"  AUC ROC      : {auc_roc:.2f}")
 
 
     # Visualize
@@ -190,6 +209,7 @@ if __name__ == "__main__":
 
     results = test_X.assign(class_label=pred_Y)
     visualize(predictions=results, confusion=confusion, borders=df_borders)
+    #visualize_roc(predictions_proba=pred_Y_proba, actual_labels=test_Y)
 
 
     print("Success")
