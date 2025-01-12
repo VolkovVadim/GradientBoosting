@@ -8,7 +8,7 @@ import numpy as np
 
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, root_mean_squared_error
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error, confusion_matrix, accuracy_score
 from matplotlib.pyplot import figure
 
 
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     # Create and fit model
     model = CatBoostClassifier(
-        iterations=2000,
+        iterations=200,
         depth=5,
         learning_rate=0.05,
         random_seed=789
@@ -135,9 +135,22 @@ if __name__ == "__main__":
     # Calculate metrics
     rmse_score = root_mean_squared_error(test_Y, pred_Y)
     mae_score = mean_absolute_error(test_Y, pred_Y)
+    accuracy_v1 = accuracy_score(test_Y, pred_Y)
+    confusion = confusion_matrix(test_Y, pred_Y)
 
-    print(f"RMSE : {rmse_score:.2f}")
-    print(f"MAE  : {mae_score:.2f}")
+    TN, FP, FN, TP = confusion.ravel()
+    accuracy_v2 = (TP + TN) / (TP + TN + FP + FN)
+    precision   = TP / (TP + FP)
+    recall      = TP / (TP + FN)
+
+    print("Results")
+    print(f"  RMSE         : {rmse_score:.2f}")
+    print(f"  MAE          : {mae_score:.2f}")
+    print(f"  Accuracy (1) : {accuracy_v1:.2f}")
+    print(f"  Accuracy (2) : {accuracy_v2:.2f}")
+    print(f"  Precision    : {precision:.2f}")
+    print(f"  Recall       : {recall:.2f}")
+
 
 
     # Visualize
