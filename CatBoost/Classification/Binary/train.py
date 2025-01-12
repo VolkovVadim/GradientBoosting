@@ -145,8 +145,10 @@ if __name__ == "__main__":
 
 
     # Create and fit model
+    TREES_COUNT = 200
+
     model = CatBoostClassifier(
-        iterations=200,
+        iterations=TREES_COUNT,
         depth=5,
         learning_rate=0.05,
         random_seed=789
@@ -210,6 +212,12 @@ if __name__ == "__main__":
     results = test_X.assign(class_label=pred_Y)
     visualize(predictions=results, confusion=confusion, borders=df_borders)
     #visualize_roc(predictions_proba=pred_Y_proba, actual_labels=test_Y)
+
+
+    # Save model to file
+    model_filename = f"binary_classification_n{TREES_COUNT}.catboost"  # extension is optional
+    model.save_model(model_filename)
+    print(f"Model saved to {model_filename}")
 
 
     print("Success")
