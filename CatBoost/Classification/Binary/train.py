@@ -154,6 +154,14 @@ if __name__ == "__main__":
 
 
     # Calculate metrics
+    test_values = list(test_Y)
+    correct, total = 0, len(test_values)
+    for index in range(total):
+        if test_values[index] == pred_Y[index]:
+            correct += 1
+
+    incorrect = total - correct
+
     rmse_score = root_mean_squared_error(test_Y, pred_Y)
     mae_score = mean_absolute_error(test_Y, pred_Y)
     accuracy_v1 = accuracy_score(test_Y, pred_Y)
@@ -164,11 +172,11 @@ if __name__ == "__main__":
     precision   = TP / (TP + FP)
     recall      = TP / (TP + FN)
 
-    print("Results")
+    print(f"Results (correct : {correct}, incorrect : {incorrect}, accuracy : {correct / total})")
     print(f"  RMSE         : {rmse_score:.2f}")
     print(f"  MAE          : {mae_score:.2f}")
-    print(f"  Accuracy (1) : {accuracy_v1:.2f}")
-    print(f"  Accuracy (2) : {accuracy_v2:.2f}")
+    print(f"  Accuracy (1) : {accuracy_v1:.3f}")
+    print(f"  Accuracy (2) : {accuracy_v2:.3f}")
     print(f"  Precision    : {precision:.2f}")
     print(f"  Recall       : {recall:.2f}")
 
