@@ -1,6 +1,7 @@
 # CatBoost
 catboost_info/
 *.catboost
+*.cbm
 
 # Datasets
 *.csv

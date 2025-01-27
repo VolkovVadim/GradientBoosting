@@ -215,7 +215,7 @@ if __name__ == "__main__":
 
 
     # Save model to file
-    model_filename = f"binary_classification_n{TREES_COUNT}.cbm"  # extension is optional
+    model_filename = f"binary_classification_v3_n{TREES_COUNT}.cbm"  # extension is optional
     model.save_model(model_filename, format="cbm")
     print(f"Model saved to {model_filename}")
 
